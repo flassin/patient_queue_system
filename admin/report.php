@@ -1,0 +1,68 @@
+<?php
+session_start();
+include("../config/db.php");
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-4">
+    <h3 class="mb-4">Admin Reports</h3>
+
+    <a href="dashboard.php" class="btn btn-primary mb-3">Back to Dashboard</a>
+
+    <?php
+    $result = $conn->query("SELECT COUNT(*) AS total FROM patients");
+    $row = $result->fetch_assoc();
+    ?>
+
+    <div class="card p-3 mb-4">
+        <h5>Total Patients Registered</h5>
+        <h2><?php echo $row['total']; ?></h2>
+    </div>
+
+    <div class="card p-3">
+        <h5>All Registered Patients</h5>
+
+        <table class="table table-bordered">
+            <tr>
+                <th>ID</th>
+                <th>Patient Name</th>
+                <th>Gender</th>
+                <th>OPD</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Registered By</th>
+            </tr>
+
+            <?php
+            $patients = $conn->query("
+                SELECT patients.*, users.username AS staff_name
+                FROM patients
+                LEFT JOIN users ON patients.staff_id = users.id
+                ORDER BY patients.id DESC
+            ");
+
+            while($p = $patients->fetch_assoc()){
+                echo "<tr>
+                        <td>".$p['id']."</td>
+                        <td>".$p['patient_name']."</td>
+                        <td>".$p['gender']."</td>
+                        <td>".$p['opd']."</td>
+                        <td>".$p['registration_date']."</td>
+                        <td>".$p['status']."</td>
+                        <td>".$p['staff_name']."</td>
+                      </tr>";
+            }
+            ?>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
